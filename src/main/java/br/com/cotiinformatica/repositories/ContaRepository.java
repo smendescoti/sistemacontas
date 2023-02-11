@@ -1,5 +1,6 @@
 package br.com.cotiinformatica.repositories;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -88,7 +89,7 @@ public class ContaRepository {
 					conta.setIdConta(rs.getInt("idconta"));
 					conta.setNome(rs.getString("nome"));
 					conta.setValor(rs.getDouble("valor"));
-					conta.setData(new SimpleDateFormat().parse(rs.getString("data")));
+					conta.setData(new SimpleDateFormat("yyyy-MM-dd").parse(rs.getString("data")));
 					conta.setTipo(rs.getInt("tipo") == 1 ? TipoConta.RECEBER : rs.getInt("tipo") == 2 ? TipoConta.PAGAR : null);
 					conta.setObservacoes(rs.getString("observacoes"));					
 				}
@@ -122,7 +123,7 @@ public class ContaRepository {
 					conta.setIdConta(rs.getInt("idconta"));
 					conta.setNome(rs.getString("nome"));
 					conta.setValor(rs.getDouble("valor"));
-					conta.setData(new SimpleDateFormat().parse(rs.getString("data")));
+					conta.setData(new SimpleDateFormat("yyyy-MM-dd").parse(rs.getString("data")));
 					conta.setTipo(rs.getInt("tipo") == 1 ? TipoConta.RECEBER : rs.getInt("tipo") == 2 ? TipoConta.PAGAR : null);
 					conta.setObservacoes(rs.getString("observacoes"));					
 				}
@@ -139,6 +140,25 @@ public class ContaRepository {
 		else
 			return null;
 	}	
+	
+	public Double sumByUsuarioAndData(Integer idUsuario, Date dataIni, Date dataFim, Integer tipo) throws Exception {
+		
+		String query = "select sum(valor) from conta where idusuario=? and data between ? and ? and tipo = ?";
+		
+		Object[] params = {
+			idUsuario,
+			java.sql.Date.valueOf(new SimpleDateFormat("yyyy-MM-dd").format(dataIni)),
+			java.sql.Date.valueOf(new SimpleDateFormat("yyyy-MM-dd").format(dataFim)),
+			tipo
+		};
+				
+		BigDecimal valor = jdbcTemplate.queryForObject(query, params, BigDecimal.class);
+		
+		if(valor != null)
+			return valor.doubleValue();
+		else
+			return 0.0;
+	}
 }
 
 
